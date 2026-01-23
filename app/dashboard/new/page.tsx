@@ -18,9 +18,19 @@ export default function NewProjectPage() {
     setLoading(true);
     setError("");
 
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setError("You must be logged in to create a project");
+      setLoading(false);
+      return;
+    }
+
     const { error: insertError } = await supabase
       .from("projects")
-      .insert({ name, slug });
+      .insert({ name, slug, owner_id: user.id });
 
     if (insertError) {
       if (insertError.code === "23505") {
