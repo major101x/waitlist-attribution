@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 interface Signup {
   id: string;
   email: string;
@@ -31,7 +33,14 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
             borderRadius: "8px",
           }}
         >
-          <h2 style={{ margin: "0 0 8px 0" }}>{project.name}</h2>
+          <Link
+            href={`/dashboard/${project.id}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <h2 style={{ margin: "0 0 8px 0", cursor: "pointer" }}>
+              {project.name} →
+            </h2>
+          </Link>
           <div
             style={{
               display: "flex",
@@ -44,6 +53,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
             <code
               style={{
                 backgroundColor: "#f5f5f5",
+                color: "#000",
                 padding: "4px 8px",
                 borderRadius: "4px",
                 fontSize: "14px",
