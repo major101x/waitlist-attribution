@@ -25,13 +25,17 @@ export default function SignupForm({ projectId }: Props) {
     // Read source from URL, default to "direct"
     const source = searchParams.get("src") || "direct";
 
-    const { error } = await supabase.from("signups").insert({
-      project_id: projectId,
-      email: email.trim(),
-      source,
+    // Call SECURITY DEFINER function - all validation happens in Postgres
+    const { data, error } = await supabase.rpc("submit_signup", {
+      p_project_id: projectId,
+      p_email: email.trim(),
+      p_source: source,
+      // Note: IP address would be captured server-side in production
+      // For now we pass null - the function handles this gracefully
+      p_ip_address: null,
     });
 
-    if (error) {
+    if (error || (data && !data.success)) {
       // Generic error message - do NOT leak DB or rate-limit details
       setStatus("error");
       setErrorMessage("Something went wrong. Please try again.");
