@@ -3,7 +3,8 @@
 import Link from "next/link";
 
 // Simple helper if date-fns not available
-function timeAgo(dateString: string) {
+function timeAgo(dateString: string | null) {
+  if (!dateString) return "unknown time";
   const date = new Date(dateString);
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -20,14 +21,14 @@ interface Signup {
   id: string;
   email: string;
   source: string;
-  created_at: string;
+  created_at: string | null;
 }
 
 interface Project {
   id: string;
   name: string;
   slug: string;
-  created_at: string;
+  created_at: string | null;
   signups: Signup[];
 }
 
@@ -36,10 +37,11 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
     <div className="grid gap-4">
       {projects.map((project) => {
         // Sort signups to get latest
-        const sortedSignups = [...project.signups].sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-        );
+        const sortedSignups = [...project.signups].sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
+        });
         const lastSignup = sortedSignups[0];
 
         return (
