@@ -2,6 +2,20 @@
 
 import Link from "next/link";
 
+// Simple helper if date-fns not available
+function timeAgo(dateString: string) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
 interface Signup {
   id: string;
   email: string;
@@ -18,86 +32,58 @@ interface Project {
 }
 
 export default function ProjectList({ projects }: { projects: Project[] }) {
-  const copyUrl = (slug: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/p/${slug}`);
-  };
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {projects.map((project) => (
-        <div
-          key={project.id}
-          style={{
-            padding: "20px",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-          }}
-        >
-          <Link
-            href={`/dashboard/${project.id}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <h2 style={{ margin: "0 0 8px 0", cursor: "pointer" }}>
-              {project.name} →
-            </h2>
-          </Link>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "16px",
-            }}
-          >
-            <span style={{ color: "#666" }}>Public URL:</span>
-            <code
-              style={{
-                backgroundColor: "#f5f5f5",
-                color: "#000",
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontSize: "14px",
-              }}
-            >
-              /p/{project.slug}
-            </code>
-            <button
-              onClick={() => copyUrl(project.slug)}
-              style={{
-                padding: "4px 8px",
-                fontSize: "12px",
-                cursor: "pointer",
-              }}
-            >
-              Copy
-            </button>
-          </div>
+    <div className="grid gap-4">
+      {projects.map((project) => {
+        // Sort signups to get latest
+        const sortedSignups = [...project.signups].sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        );
+        const lastSignup = sortedSignups[0];
 
-          <div style={{ borderTop: "1px solid #eee", paddingTop: "12px" }}>
-            <h3
-              style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#333" }}
-            >
-              Signups ({project.signups?.length || 0})
-            </h3>
-            {project.signups && project.signups.length > 0 ? (
-              <ul style={{ margin: 0, paddingLeft: "20px", fontSize: "14px" }}>
-                {project.signups.map((signup) => (
-                  <li key={signup.id} style={{ marginBottom: "4px" }}>
-                    {signup.email}
-                    <span style={{ color: "#999", marginLeft: "8px" }}>
-                      via {signup.source}
+        return (
+          <Link
+            key={project.id}
+            href={`/dashboard/${project.id}`}
+            className="block p-6 rounded-lg border border-[var(--color-border)] bg-[var(--bg-card)] hover:border-[var(--color-brand)] transition-colors group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-brand)] transition-colors mb-1">
+                  {project.name}
+                </h2>
+                <div className="text-sm text-[var(--text-secondary)] font-mono">
+                  /p/{project.slug}
+                </div>
+                {lastSignup && (
+                  <div className="mt-4 text-xs text-[var(--text-tertiary)] flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    Last signup {timeAgo(lastSignup.created_at)} via{" "}
+                    <span className="font-medium text-[var(--text-secondary)]">
+                      {lastSignup.source}
                     </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p style={{ margin: 0, color: "#999", fontSize: "14px" }}>
-                No signups yet
-              </p>
-            )}
-          </div>
-        </div>
-      ))}
+                  </div>
+                )}
+                {!lastSignup && (
+                  <div className="mt-4 text-xs text-[var(--text-tertiary)]">
+                    No signups yet. Share your link to start tracking.
+                  </div>
+                )}
+              </div>
+
+              <div className="text-right">
+                <div className="text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+                  {project.signups.length}
+                </div>
+                <div className="text-xs uppercase tracking-wider font-semibold text-[var(--text-tertiary)] mt-1">
+                  Signups
+                </div>
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

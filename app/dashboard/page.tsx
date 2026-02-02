@@ -21,36 +21,29 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div style={{ maxWidth: "800px", margin: "40px auto", padding: "20px" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "32px",
-        }}
-      >
-        <h1>Your Projects</h1>
-        <Link
-          href="/dashboard/new"
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#000",
-            color: "#fff",
-            textDecoration: "none",
-            borderRadius: "4px",
-          }}
-        >
-          Create Project
+    <div className="layout-container py-12">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold tracking-tight">Your Projects</h1>
+        <Link href="/dashboard/new" className="btn-primary">
+          + New Project
         </Link>
       </div>
 
       {error && (
-        <p style={{ color: "red" }}>Error loading projects: {error.message}</p>
+        <div className="p-4 rounded bg-red-50 text-red-600 border border-red-100 mb-6">
+          Error loading projects: {error.message}
+        </div>
       )}
 
       {projects && projects.length === 0 && (
-        <p style={{ color: "#666" }}>No projects yet. Create your first one!</p>
+        <div className="text-center py-20 border border-dashed border-[var(--color-border)] rounded-lg bg-[var(--bg-secondary)]">
+          <p className="text-[var(--text-secondary)] mb-4">
+            You haven&apos;t created any tracking endpoints yet.
+          </p>
+          <Link href="/dashboard/new" className="btn-secondary">
+            Create your first project
+          </Link>
+        </div>
       )}
 
       {projects && projects.length > 0 && <ProjectList projects={projects} />}
