@@ -4,7 +4,7 @@ A portfolio-grade full-stack application demonstrating secure public data ingest
 
 ## Problem Statement
 
-Founders launching on Twitter (or any social platform) want to know which posts, links, or sources are actually driving signups. Most early-stage founders don't need analytics dashboards or Google Analytics complexity—they just want clean attribution tied to emails.
+Founders launching on Twitter (or any social platform) want to know which posts, links, or sources are actually driving signups. Most early-stage founders don't need analytics dashboards or Google Analytics complexity, they just want clean attribution tied to emails.
 
 This MVP solves **signup attribution**, not growth or conversion optimization.
 
